@@ -1,0 +1,27 @@
+
+wget de2.php.net/get/php-7.2.0.tar.gz/from/this/mirror
+
+
+sudo apt-get install autoconf
+Unpacking autoconf (2.69-8) ...
+Unpacking automake (1:1.14.1-4+deb8u1)
+
+sudo apt-get install libtool
+Setting up libtool (2.4.2-1.11)
+
+sudo apt-get install re2c
+Setting up re2c (0.13.5-1) ...
+
+sudo apt-get install bison
+Setting up bison (2:3.0.2.dfsg-2) ...
+
+
+https://stackoverflow.com/questions/18566774/how-to-install-apxs-module-on-apache-2-4-6
+
+
+
+to install apxs on ubuntu, install theapache2-dev package.
+
+sudo apt-get install apache2-dev
+
+
