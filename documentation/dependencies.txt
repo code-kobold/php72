@@ -1,6 +1,6 @@
 
 wget de2.php.net/get/php-7.2.0.tar.gz/from/this/mirror
-
+http://de2.php.net/distributions/php-7.2.0.tar.gz
 
 sudo apt-get install autoconf
 Unpacking autoconf (2.69-8) ...
@@ -20,8 +20,16 @@ https://stackoverflow.com/questions/18566774/how-to-install-apxs-module-on-apach
 
 
 
-to install apxs on ubuntu, install theapache2-dev package.
+to install apxs (https://httpd.apache.org/docs/2.4/programs/apxs.html) on ubuntu, install the apache2-dev package.
 
 sudo apt-get install apache2-dev
+
+
+default: libtool: install: install .libs/libphp7.so /usr/lib/apache2/modules/libphp7.so
+==> default: libtool: install: install .libs/libphp7.lai /usr/lib/apache2/modules/libphp7.la
+==> default: libtool: install: warning: remember to run `libtool --finish /tmp/php/php-7.2.0/libs'
+==> default: chmod 644 /usr/lib/apache2/modules/libphp7.so
+==> default: [preparing module `php7' in /etc/apache2/mods-available/php7.load]
+
 
 

@@ -2,6 +2,12 @@
 
 # https://github.com/mattandersen/vagrant-lamp/blob/master/provision.sh
 
+php_version="7.2"
+php_version_long="7.2.0"
+php_source="php-${php_version_long}.tar.gz"
+
+homeDir="/home/vagrant/php72"
+
 apache_env_file="/etc/apache2/envvars"
 apache_config_file="/etc/apache2/apache2.conf"
 apache_vhost_file="/etc/apache2/sites-available/vagrant_vhost.conf"
@@ -18,7 +24,7 @@ main() {
 
     export DEBIAN_FRONTEND=noninteractive
 
-	update_go
+	update_proc
 
 	if [[ -e /var/lock/vagrant-provision ]]; then
 	    cat 1>&2 << EOD
@@ -33,83 +39,60 @@ EOD
 	    exit
 	fi
 
-	network_go
-	swap_go
-	java_go
-	apache_go
-#	php_go
-	mysql_go
-	bash_go
-#	node_go
-#	yarn_go
-#	gulp_go
-	permissions_go
+	network_proc
+	swap_proc
+	java_proc
+	apache_proc
+	mysql_proc
+	bash_proc
+	permissions_proc
+	install_proc
 
 	touch /var/lock/vagrant-provision
 }
 
-install_go() {
-    mkdir /tmp/php
-    cp /home/vagrant/php-7.2.0.tar.gz /tmp/php
+install_proc() {
+    if [[ ! -f "${homeDir}/sources/${php_source}" ]]
+    then
+        echo "Downloading PHP sources ${php_source}"
+        wget -q http://de2.php.net/distributions/${php_source} > "${homeDir}/sources/${php_source}"
+    else
+        echo "${php_source} does exist..."
+    fi
+
+    rm -rf /tmp/php
+    mkdir -p /tmp/php
+    cp "${homeDir}/sources/${php_source}" /tmp/php
+
     cd /tmp/php
+    tar xfz ${php_source}
 
-    tar xfz php-7.2.0.tar.gz
-    cd php-7.2.0
+    cd php-${php_version_long}
+    ./configure \
+        --with-apxs2=/usr/bin/apxs \
+        --with-mysqli
 
-    ./configure --with-apxs2=/usr/bin/apxs --with-mysqli
     make
     make install
 }
 
-permissions_go() {
+permissions_proc() {
     echo
     echo "******************************"
-    echo "** permissions_go ************"
+    echo "** permissions_proc ************"
     echo "******************************"
 
-    chown -R vagrant:vagrant /home/vagrant/php72
-    touch /home/vagrant/php72/var/log
-    chmod -R 777 /home/vagrant/php72/var/log
-    touch /home/vagrant/php72/var/cache
-    chmod -R 777 /home/vagrant/php72/var/cache
+    chown -R vagrant:vagrant ${homeDir}
+#    touch /home/vagrant/php72/var/log
+#    chmod -R 777 /home/vagrant/php72/var/log
+#    touch /home/vagrant/php72/var/cache
+#    chmod -R 777 /home/vagrant/php72/var/cache
 }
 
-gulp_go() {
+update_proc() {
     echo
     echo "******************************"
-    echo "** gulp_go *******************"
-    echo "******************************"
-
-    yarn global gulp --dev
-    yarn add @symfony/webpack-encore --dev
-}
-
-yarn_go() {
-    echo
-    echo "******************************"
-    echo "** yarn_go *******************"
-    echo "******************************"
-
-    curl -sS https://dl.yarnpkg.com/debian/pubkey.gpg | apt-key add -
-    echo "deb https://dl.yarnpkg.com/debian/ stable main" | tee /etc/apt/sources.list.d/yarn.list
-    apt-get update && apt-get -y install yarn
-    cd /home/vagrant/php72 && yarn init -y
-}
-
-node_go() {
-    echo
-    echo "******************************"
-    echo "** node_go *******************"
-    echo "******************************"
-
-    curl -sL https://deb.nodesource.com/setup_8.x | sudo -E bash -
-    sudo apt-get install -y nodejs
-}
-
-update_go() {
-    echo
-    echo "******************************"
-    echo "** update_go *****************"
+    echo "** update_proc *****************"
     echo "******************************"
 
     # Install basic tools
@@ -121,19 +104,16 @@ update_go() {
 	apt-get -y install ca-certificates
 	apt-get -y install zip
 	apt-get -y install unzip
-    apt-get install -y libxml2-dev
-
-#    wget -O /etc/apt/trusted.gpg.d/php.gpg https://packages.sury.org/php/apt.gpg
-#    echo "deb https://packages.sury.org/php/ $(lsb_release -sc) main" > /etc/apt/sources.list.d/php.list
+    apt-get -y install libxml2-dev
 
 	apt-get update
 	apt-get -y upgrade
 }
 
-bash_go() {
+bash_proc() {
     echo
     echo "******************************"
-    echo "** bash_go *******************"
+    echo "** bash_proc *******************"
     echo "******************************"
 
 	cat << EOF > ${bash_aliases}
@@ -141,25 +121,24 @@ alias ll='ls -alF'
 alias la='ls -A'
 alias l='ls -CF'
 alias lll='ls -al'
-alias runtests='vendor/phpunit/phpunit/phpunit -c config/phpunit.xml.dist --testsuite=Foo '
 EOF
 }
 
-network_go() {
+network_proc() {
     echo
     echo "******************************"
-    echo "** network_go ****************"
+    echo "** network_proc ****************"
     echo "******************************"
 
 	IPADDR=$(/sbin/ifconfig eth0 | awk '/inet / { print $2 }' | sed 's/addr://')
 	sed -i "s/^${IPADDR}.*//" /etc/hosts
-	echo ${IPADDR} ubuntu.localhost >> /etc/hosts			# quiet down some error messages
+	echo ${IPADDR} vagrant.localhost >> /etc/hosts
 }
 
-swap_go() {
+swap_proc() {
     echo
     echo "******************************"
-    echo "** swap_go *******************"
+    echo "** swap_proc *******************"
     echo "******************************"
 
     # https://gist.github.com/shovon/9dd8d2d1a556b8bf9c82
@@ -180,10 +159,10 @@ swap_go() {
     fi
 }
 
-apache_go() {
+apache_proc() {
     echo
     echo "******************************"
-    echo "** apache_go *****************"
+    echo "** apache_proc *****************"
     echo "******************************"
 
 	apt-get -y install apache2-dev
@@ -231,28 +210,28 @@ EOF
 	update-rc.d apache2 enable
 }
 
-java_go() {
+java_proc() {
     echo
     echo "******************************"
-    echo "** java_go *******************"
+    echo "** java_proc *******************"
     echo "******************************"
 
     apt-get -y install default-jre
 }
 
-sqlite_go() {
+sqlite_proc() {
     echo
     echo "******************************"
-    echo "** sqlite_go *****************"
+    echo "** sqlite_proc *****************"
     echo "******************************"
 
     apt-get -y install sqlite3
 }
 
-php_go() {
+php_proc() {
     echo
     echo "******************************"
-    echo "** php_go ********************"
+    echo "** php_proc ********************"
     echo "******************************"
 
     x="$(dpkg --list | grep php | awk '/^ii/{ print $2}')"
@@ -284,9 +263,9 @@ EOF
 	service apache2 reload
 }
 
-mysql_go() {
+mysql_proc() {
     echo "******************************"
-    echo "** mysql_go ******************"
+    echo "** mysql_proc ******************"
     echo "******************************"
 
 	echo "mysql-server mysql-server/root_password password root" | debconf-set-selections
@@ -301,15 +280,6 @@ mysql_go() {
 	echo "GRANT ALL PRIVILEGES ON *.* TO 'root'@'%' IDENTIFIED BY 'root' WITH GRANT OPTION" | mysql -u root --password=root
 	echo "GRANT PROXY ON ''@'' TO 'root'@'%' WITH GRANT OPTION" | mysql -u root --password=root
     echo
-    echo "Where am I?" #/home/vagrant
-    echo
-
-    # Generate project-specific DB settings
-    # Base dir is project home in guest box (usually where Vagrantfile resides, e.g. /home/vagrant)
-    mysql -u root --password=root < php72/provision/sql/admin.sql
-
-    # Import project dump
-#    mysql -u root --password=root php72 < php72/provision/sql/import.sql
 
 	service mysql restart
 	update-rc.d apache2 enable
