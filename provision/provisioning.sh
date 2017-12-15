@@ -70,7 +70,8 @@ install_proc() {
     cd php-${php_version_long}
     ./configure \
         --with-apxs2=/usr/bin/apxs \
-        --with-mysqli
+        --with-mysqli \
+        --with-readline
 
     make
     make install
@@ -83,10 +84,6 @@ permissions_proc() {
     echo "******************************"
 
     chown -R vagrant:vagrant ${homeDir}
-#    touch /home/vagrant/php72/var/log
-#    chmod -R 777 /home/vagrant/php72/var/log
-#    touch /home/vagrant/php72/var/cache
-#    chmod -R 777 /home/vagrant/php72/var/cache
 }
 
 update_proc() {
@@ -105,6 +102,7 @@ update_proc() {
 	apt-get -y install zip
 	apt-get -y install unzip
     apt-get -y install libxml2-dev
+    apt-get -y install libreadline6 libreadline6-dev
 
 	apt-get update
 	apt-get -y upgrade

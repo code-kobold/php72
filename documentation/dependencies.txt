@@ -30,6 +30,48 @@ default: libtool: install: install .libs/libphp7.so /usr/lib/apache2/modules/lib
 ==> default: libtool: install: warning: remember to run `libtool --finish /tmp/php/php-7.2.0/libs'
 ==> default: chmod 644 /usr/lib/apache2/modules/libphp7.so
 ==> default: [preparing module `php7' in /etc/apache2/mods-available/php7.load]
+https://www.linuxquestions.org/questions/slackware-14/libtool-warning-remember-to-run-%27libtool-finish-usr-lib64%27-while-compiling-slackbuilds-4175593774/
+https://stackoverflow.com/questions/32766609/libtool-installation-issue-with-make-install
+https://lists.gnu.org/archive/html/libtool/2006-12/msg00011.html
+
+
+
+erating locales (this might take a while)...
+==> default:   en_US.UTF-8
+==> default: ...
+==> default:  done
+==> default: Generation complete.
+==> default: Site 000-default already disabled
+==> default: Site vagrant_vhost already enabled
+==> default: Module rewrite already enabled
+==> default: Job for apache2.service failed. See 'systemctl status apache2.service' and 'journalctl -xn' for details.
+==> default: ******************************
+==> default: ** mysql_proc ******************
+==> default: ******************************
+==> default: Reading package lists...
+==> default: Building dependency tree...
+
+
+==> default: Configuring SAPI modules
+==> default: checking for Apache 2.0 handler-module support via DSO through APXS...
+==> default: [Thu Dec 14 20:04:31.579648 2017] [core:warn] [pid 3944] AH00111: Config variable ${APACHE_LOCK_DIR} is not defined
+==> default: [Thu Dec 14 20:04:31.580031 2017] [core:warn] [pid 3944] AH00111: Config variable ${APACHE_PID_FILE} is not defined
+==> default: [Thu Dec 14 20:04:31.580256 2017] [core:warn] [pid 3944] AH00111: Config variable ${APACHE_RUN_USER} is not defined
+==> default: [Thu Dec 14 20:04:31.580421 2017] [core:warn] [pid 3944] AH00111: Config variable ${APACHE_RUN_GROUP} is not defined
+==> default: [Thu Dec 14 20:04:31.580589 2017] [core:warn] [pid 3944] AH00111: Config variable ${APACHE_LOG_DIR} is not defined
+==> default: [Thu Dec 14 20:04:31.590956 2017] [core:warn] [pid 3944:tid 139758950172544] AH00111: Config variable ${APACHE_LOG_DIR} is not defined
+==> default: [Thu Dec 14 20:04:31.591804 2017] [php7:crit] [pid 3944:tid 139758950172544] Apache is running a threaded MPM, but your PHP Module is not compiled to be threadsafe.  You need to recompile PHP.
+==> default: AH00013: Pre-configuration failed
+
+==> default: checking for readline support...
+==> default: yes
+==> default: configure: error: Please reinstall readline - I cannot find readline.h
+==> default: make: *** No targets specified and no makefile found.  Stop.
+==> default: make: *** No rule to make target 'install'.  Stop.
+
+
+
+
 
 
 
